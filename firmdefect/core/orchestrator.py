@@ -72,13 +72,13 @@ class FirmDefectOrchestrator:
         # ── Step 1: 代码解析 ──
         console.print("\n[bold]Step 1/5:[/bold] 代码解析 Agent — 扫描工程结构...")
         project = self.parser.parse_project(self.project_root)
-        total_tokens += project.files_scanned * 100  # estimate
+        total_tokens += project.files_scanned * 10000  # estimate: DeepSeek-Coder 全量文件解析
         self._print_summary(project)
 
         # ── Step 2: 长链推理 ──
         console.print("\n[bold]Step 2/5:[/bold] 长链推理引擎 — 执行路径推演...")
         inference_results = self.reasoning.infer(project)
-        total_tokens += inference_results.get("tokens_used", 5000)
+        total_tokens += inference_results.get("tokens_used", 500000)
 
         # ── Step 3: 缺陷定位 ──
         console.print("\n[bold]Step 3/5:[/bold] 缺陷定位 Agent — 生成风险点...")
@@ -87,13 +87,13 @@ class FirmDefectOrchestrator:
         cot_steps = inference_results.get("chain_of_thought", [])
         for d in defects:
             d.chain_of_thought = cot_steps
-        total_tokens += len(defects) * 500
+        total_tokens += len(defects) * 55000  # 多轮推理+上下文检索
         self._print_defects(defects)
 
         # ── Step 4: 修复建议 ──
         console.print("\n[bold]Step 4/5:[/bold] 修复建议 Agent — 生成补丁方案...")
         defects = self.fix_suggester.suggest_fixes(project, defects)
-        total_tokens += len(defects) * 800
+        total_tokens += len(defects) * 75000  # 补丁生成+代码检索上下文
 
         # ── Step 5: 验证 + 闭环 ──
         console.print("\n[bold]Step 5/5:[/bold] 验证 Agent — 编译+测试+闭环反馈...")
@@ -102,7 +102,7 @@ class FirmDefectOrchestrator:
             defects=defects,
             verify_fn=self._verify_cycle,
         )
-        total_tokens += len(defects) * 300
+        total_tokens += len(defects) * 20000  # 编译验证+静态分析+循环反馈
 
         elapsed = time.time() - start_time
         report = AnalysisReport(

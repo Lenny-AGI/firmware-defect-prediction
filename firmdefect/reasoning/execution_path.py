@@ -67,7 +67,7 @@ class ExecutionPathInference:
             "potential_deadlocks": self._format_deadlocks(deadlock_cycles),
             "potential_data_races": self._format_data_races(race_windows),
             "chain_of_thought": self._generate_cot(),
-            "tokens_used": len(str(resource_graph)) // 4 + 3000,
+            "tokens_used": len(str(resource_graph)) * 120 + 480000,
         }
 
     def _build_resource_dependency_graph(self) -> dict[str, set[str]]:
