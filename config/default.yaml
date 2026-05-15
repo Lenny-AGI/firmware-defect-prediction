@@ -1,0 +1,34 @@
+# FirmDefect 默认配置
+project:
+  root: "."
+  file_extensions: [".c", ".h", ".s", ".S"]
+  exclude_dirs: ["build", "out", "vendor", "third_party"]
+
+reasoning:
+  max_iterations: 3
+  model: "deepseek-coder"
+  temperature: 0.1
+  max_tokens: 4096
+
+agents:
+  parser:
+    model: "claude-3-opus-20240229"
+    temperature: 0.0
+  locator:
+    model: "gpt-4o"
+    temperature: 0.1
+  fix_suggester:
+    model: "gpt-4o-mini"
+    temperature: 0.3
+  verifier:
+    compiler: "gcc"
+    cflags: ["-Wall", "-Wextra", "-O2", "-g", "-fsanitize=thread"]
+    timeout_seconds: 300
+
+feedback:
+  max_retry: 3
+  rollback_on_failure: true
+
+report:
+  format: "html"
+  output_dir: "./reports"
